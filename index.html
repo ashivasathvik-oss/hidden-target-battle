@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hidden Target Battle</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:white;
+}
+
+.game{
+    width:460px;
+    max-width:100%;
+    padding:25px;
+    border-radius:24px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.15);
+    box-shadow:0 20px 50px rgba(0,0,0,.4);
+    text-align:center;
+}
+
+.hidden{
+    display:none !important;
+}
+
+button{
+    cursor:pointer;
+    user-select:none;
+}
+
+.logo{
+    font-size:50px;
+}
+
+h1{
+    font-size:27px;
+    margin:5px 0;
+}
+
+.subtitle{
+    color:#94a3b8;
+    font-size:13px;
+    margin-bottom:20px;
+}
+
+.box{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:12px;
+}
+
+.label{
+    display:block;
+    color:#cbd5e1;
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:9px;
+}
+
+.mode-buttons{
+    display:flex;
+    gap:9px;
+}
+
+.mode-btn{
+    flex:1;
+    padding:12px;
+    border:2px solid transparent;
+    border-radius:9px;
+    background:#334155;
+    color:white;
+    font-weight:bold;
+}
+
+.mode-btn.selected{
+    background:#2563eb;
+    border-color:#60a5fa;
+}
+
+.options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+input,
+select{
+    width:100%;
+    height:45px;
+    border:0;
+    outline:0;
+    border-radius:8px;
+    background:#1e293b;
+    color:white;
+    text-align:center;
+    font-size:16px;
+}
+
+.start,
+.menu,
+.next,
+.playagain{
+    width:100%;
+    border:0;
+    border-radius:9px;
+    padding:13px;
+    color:white;
+    font-weight:bold;
+    margin-top:8px;
+}
+
+.start{
+    background:#2563eb;
+}
+
+.menu{
+    background:#475569;
+}
+
+.next{
+    background:#16a34a;
+}
+
+.playagain{
+    background:#2563eb;
+}
+
+.round{
+    display:inline-block;
+    padding:7px 14px;
+    border-radius:20px;
+    background:rgba(255,255,255,.08);
+    color:#cbd5e1;
+    font-size:12px;
+    margin-bottom:10px;
+}
+
+.scores{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin:15px 0;
+}
+
+.score{
+    padding:10px;
+    border-radius:11px;
+    background:rgba(255,255,255,.07);
+    border:2px solid transparent;
+}
+
+.score.active{
+    border-color:#38bdf8;
+}
+
+.score h3{
+    color:#94a3b8;
+    font-size:11px;
+}
+
+.score p{
+    font-size:23px;
+    font-weight:bold;
+    margin-top:3px;
+}
+
+.status{
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:14px;
+}
+
+.guess-display{
+    width:225px;
+    height:65px;
+    margin:0 auto 14px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border-radius:12px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.1);
+    color:white;
+    font-size:28px;
+    font-weight:bold;
+    letter-spacing:5px;
+}
+
+.number-pad{
+    width:100%;
+    max-width:300px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+.num-btn{
+    height:52px;
+    border:none;
+    border-radius:10px;
+    background:#334155;
+    color:white;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.num-btn:active{
+    transform:scale(.94);
+}
+
+.clear-btn{
+    background:#dc2626;
+}
+
+.back-btn{
+    background:#d97706;
+}
+
+.submit-pad{
+    margin-top:9px;
+    width:100%;
+    height:52px;
+    border:0;
+    border-radius:10px;
+    background:#2563eb;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.hint{
+    min-height:52px;
+    margin-top:14px;
+    padding:13px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border-radius:11px;
+    background:rgba(255,255,255,.07);
+    font-weight:bold;
+}
+
+.hint.low{
+    color:#38bdf8;
+}
+
+.hint.high{
+    color:#fb7185;
+}
+
+.hint.close{
+    color:#fb923c;
+}
+
+.hint.correct{
+    color:#4ade80;
+}
+
+.hint.error{
+    color:#facc15;
+}
+
+.robot-panel{
+    margin-top:15px;
+    padding:12px;
+    border-radius:12px;
+    background:rgba(255,255,255,.06);
+}
+
+.robot-face{
+    font-size:35px;
+}
+
+.robot-status{
+    color:#cbd5e1;
+    font-size:13px;
+    margin-top:4px;
+}
+
+.trophy{
+    font-size:70px;
+}
+
+.winner{
+    color:#4ade80;
+    font-size:25px;
+    font-weight:bold;
+    margin:12px 0;
+}
+
+.final-score{
+    padding:15px;
+    border-radius:11px;
+    background:rgba(255,255,255,.07);
+    margin-bottom:15px;
+    line-height:2;
+}
+
+@media(max-width:480px){
+    .game{
+        padding:18px;
+    }
+
+    .options{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+<div id="menuScreen">
+
+    <div class="logo">🎯</div>
+
+    <h1>HIDDEN TARGET BATTLE</h1>
+
+    <div class="subtitle">
+        Choose your requirements and start the game
+    </div>
+
+    <div class="box">
+
+        <div class="label">GAME MODE</div>
+
+        <div class="mode-buttons">
+
+            <button type="button"
+                    id="robotOn"
+                    class="mode-btn selected">
+                🤖 Robot ON
+            </button>
+
+            <button type="button"
+                    id="robotOff"
+                    class="mode-btn">
+                👥 Robot OFF
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="box">
+
+        <div class="label">SHOW GUESS</div>
+
+        <div class="mode-buttons">
+
+            <button type="button"
+                    id="showGuessOn"
+                    class="mode-btn selected">
+                👀 SHOW ON
+            </button>
+
+            <button type="button"
+                    id="showGuessOff"
+                    class="mode-btn">
+                🔒 SHOW OFF
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="options">
+
+        <div class="box">
+
+            <div class="label">NUMBER OF ROUNDS</div>
+
+            <input id="roundsInput"
+                   type="number"
+                   value="3"
+                   min="1">
+
+        </div>
+
+        <div class="box">
+
+            <div class="label">PLAYERS</div>
+
+            <select id="playersSelect">
+
+                <option value="2">2 Players</option>
+                <option value="3">3 Players</option>
+                <option value="4">4 Players</option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+    <div class="box" id="robotLevelBox">
+
+        <div class="label">ROBOT LEVEL</div>
+
+        <select id="robotLevelSelect">
+
+            <option value="easy">Easy 🤖</option>
+            <option value="medium">Medium 🤖</option>
+            <option value="hard">Hard 🤖</option>
+            <option value="expert">Expert 🤖</option>
+
+        </select>
+
+    </div>
+
+    <button type="button"
+            id="startButton"
+            class="start">
+        🎮 START GAME
+    </button>
+
+</div>
+
+
+<div id="gameScreen" class="hidden">
+
+    <div id="roundText" class="round">
+        ROUND 1 / 3
+    </div>
+
+    <button type="button"
+            id="mainMenuButton"
+            class="menu">
+        🏠 MAIN MENU
+    </button>
+
+    <div class="scores">
+
+        <div id="score1Box" class="score active">
+            <h3>PLAYER 1</h3>
+            <p id="score1">0</p>
+        </div>
+
+        <div id="score2Box" class="score">
+            <h3 id="player2Name">ROBOT 🤖</h3>
+            <p id="score2">0</p>
+        </div>
+
+        <div id="score3Box" class="score hidden">
+            <h3>PLAYER 3</h3>
+            <p id="score3">0</p>
+        </div>
+
+        <div id="score4Box" class="score hidden">
+            <h3>PLAYER 4</h3>
+            <p id="score4">0</p>
+        </div>
+
+    </div>
+
+    <div id="status" class="status">
+        PLAYER 1'S TURN
+    </div>
+
+    <div id="guessDisplay"
+         class="guess-display">
+        _
+    </div>
+
+    <div class="number-pad">
+
+        <button type="button" class="num-btn" data-number="1">1</button>
+        <button type="button" class="num-btn" data-number="2">2</button>
+        <button type="button" class="num-btn" data-number="3">3</button>
+        <button type="button" class="num-btn" data-number="4">4</button>
+        <button type="button" class="num-btn" data-number="5">5</button>
+        <button type="button" class="num-btn" data-number="6">6</button>
+        <button type="button" class="num-btn" data-number="7">7</button>
+        <button type="button" class="num-btn" data-number="8">8</button>
+        <button type="button" class="num-btn" data-number="9">9</button>
+
+        <button type="button"
+                class="num-btn clear-btn"
+                id="clearButton">
+            CLEAR
+        </button>
+
+        <button type="button"
+                class="num-btn"
+                data-number="0">
+            0
+        </button>
+
+        <button type="button"
+                class="num-btn back-btn"
+                id="backButton">
+            ⌫
+        </button>
+
+    </div>
+
+    <button type="button"
+            id="submitButton"
+            class="submit-pad">
+        🎯 SUBMIT GUESS
+    </button>
+
+    <div id="hint" class="hint">
+        Enter a number
+    </div>
+
+    <button type="button"
+            id="nextButton"
+            class="next hidden">
+        NEXT ROUND
+    </button>
+
+    <div id="robotPanel"
+         class="robot-panel">
+
+        <div id="robotFace"
+             class="robot-face">
+            🤖
+        </div>
+
+        <div id="robotStatus"
+             class="robot-status">
+            Robot is ready
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="resultScreen" class="hidden">
+
+    <div class="trophy">🏆</div>
+
+    <div>FINAL RESULT</div>
+
+    <div id="winner"
+         class="winner"></div>
+
+    <div id="finalScore"
+         class="final-score"></div>
+
+    <button type="button"
+            id="playAgainButton"
+            class="playagain">
+        🔄 PLAY AGAIN
+    </button>
+
+</div>
+
+</div>
+
+
+<script>
+
+let robotMode = true;
+let showGuess = true;
+let selectedRobotLevel = "easy";
+
+let totalRounds = 3;
+let totalPlayers = 2;
+
+let currentRound = 1;
+let currentPlayer = 1;
+
+let targetNumber = 0;
+let currentGuess = "";
+
+let roundFinished = false;
+let robotThinking = false;
+
+let robotTimer = null;
+let robotDisplayTimer = null;
+
+let scores = [0,0,0,0];
+
+
+const $ = id => document.getElementById(id);
+
+const menuScreen = $("menuScreen");
+const gameScreen = $("gameScreen");
+const resultScreen = $("resultScreen");
+
+const robotOnButton = $("robotOn");
+const robotOffButton = $("robotOff");
+
+const showGuessOnButton = $("showGuessOn");
+const showGuessOffButton = $("showGuessOff");
+
+const robotLevelBox = $("robotLevelBox");
+const robotLevelSelect = $("robotLevelSelect");
+
+const robotPanel = $("robotPanel");
+
+const roundsInput = $("roundsInput");
+const playersSelect = $("playersSelect");
+
+const startButton = $("startButton");
+const mainMenuButton = $("mainMenuButton");
+
+const submitButton = $("submitButton");
+const nextButton = $("nextButton");
+
+const playAgainButton = $("playAgainButton");
+
+const clearButton = $("clearButton");
+const backButton = $("backButton");
+
+const guessDisplay = $("guessDisplay");
+
+const hint = $("hint");
+const statusText = $("status");
+
+const robotFace = $("robotFace");
+const robotStatus = $("robotStatus");
+
+
+robotOnButton.onclick = function(){
+
+    cancelRobotTimer();
+
+    robotThinking = false;
+    robotMode = true;
+
+    updateRobotUI();
+
+};
+
+
+robotOffButton.onclick = function(){
+
+    cancelRobotTimer();
+
+    robotThinking = false;
+    robotMode = false;
+
+    if(currentPlayer === 2){
+        currentPlayer = 1;
+    }
+
+    updateRobotUI();
+
+    if(!gameScreen.classList.contains("hidden")){
+        updateTurn();
+    }
+
+};
+
+
+showGuessOnButton.onclick = function(){
+
+    showGuess = true;
+
+    updateShowGuessUI();
+    updateGuessDisplay();
+
+};
+
+
+showGuessOffButton.onclick = function(){
+
+    showGuess = false;
+
+    updateShowGuessUI();
+    updateGuessDisplay();
+
+};
+
+
+function updateShowGuessUI(){
+
+    if(showGuess){
+
+        showGuessOnButton.classList.add("selected");
+        showGuessOffButton.classList.remove("selected");
+
+    }
+    else{
+
+        showGuessOffButton.classList.add("selected");
+        showGuessOnButton.classList.remove("selected");
+
+    }
+
+}
+
+
+function updateRobotUI(){
+
+    if(robotMode){
+
+        robotOnButton.classList.add("selected");
+        robotOffButton.classList.remove("selected");
+
+        robotLevelBox.classList.remove("hidden");
+
+    }
+    else{
+
+        robotOffButton.classList.add("selected");
+        robotOnButton.classList.remove("selected");
+
+        robotLevelBox.classList.add("hidden");
+
+    }
+
+
+    if(
+        robotMode &&
+        !gameScreen.classList.contains("hidden")
+    ){
+
+        robotPanel.classList.remove("hidden");
+
+    }
+    else{
+
+        robotPanel.classList.add("hidden");
+
+    }
+
+
+    updatePlayer2Name();
+
+}
+
+
+function updatePlayer2Name(){
+
+    const name = $("player2Name");
+
+    name.innerText =
+    robotMode
+    ? "ROBOT 🤖"
+    : "PLAYER 2";
+
+}
+
+
+startButton.onclick = startGame;
+
+
+function startGame(){
+
+    const r =
+    parseInt(roundsInput.value,10);
+
+    const p =
+    parseInt(playersSelect.value,10);
+
+
+    if(
+        Number.isNaN(r) ||
+        r < 1
+    ){
+
+        alert("Please enter at least 1 round.");
+
+        return;
+
+    }
+
+
+    totalRounds = r;
+    totalPlayers = p;
+
+    selectedRobotLevel =
+    robotLevelSelect.value;
+
+    scores = [0,0,0,0];
+
+    currentRound = 1;
+    currentPlayer = 1;
+
+    currentGuess = "";
+
+    roundFinished = false;
+    robotThinking = false;
+
+    cancelRobotTimer();
+
+    createTarget();
+
+    menuScreen.classList.add("hidden");
+    resultScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+
+    updatePlayerBoxes();
+    updateScores();
+    updateRound();
+    resetRound();
+
+    updateRobotUI();
+    updateShowGuessUI();
+
+}
+
+
+function createTarget(){
+
+    targetNumber =
+    Math.floor(Math.random()*100)+1;
+
+}
+
+
+function updatePlayerBoxes(){
+
+    for(let i=1;i<=4;i++){
+
+        const box =
+        $("score"+i+"Box");
+
+        if(i <= totalPlayers){
+            box.classList.remove("hidden");
+        }
+        else{
+            box.classList.add("hidden");
+        }
+
+    }
+
+    updatePlayer2Name();
+
+}
+
+
+function updateScores(){
+
+    for(let i=1;i<=4;i++){
+
+        $("score"+i).innerText =
+        scores[i-1];
+
+    }
+
+}
+
+
+function updateRound(){
+
+    $("roundText").innerText =
+    "ROUND " +
+    currentRound +
+    " / " +
+    totalRounds;
+
+}
+
+
+function getPlayerName(player){
+
+    if(
+        robotMode &&
+        player === 2
+    ){
+
+        return "ROBOT 🤖";
+
+    }
+
+    return "PLAYER " + player;
+
+}
+
+
+function updateTurn(){
+
+    for(let i=1;i<=4;i++){
+
+        $("score"+i+"Box")
+        .classList.remove("active");
+
+    }
+
+
+    const active =
+    $("score"+currentPlayer+"Box");
+
+
+    if(active){
+        active.classList.add("active");
+    }
+
+
+    statusText.innerText =
+    getPlayerName(currentPlayer) +
+    "'S TURN";
+
+}
+
+
+function updateGuessDisplay(){
+
+    if(currentGuess === ""){
+
+        guessDisplay.innerText = "_";
+
+        return;
+
+    }
+
+
+    if(showGuess){
+
+        guessDisplay.innerText =
+        currentGuess;
+
+    }
+    else{
+
+        guessDisplay.innerText =
+        "🔒";
+
+    }
+
+}
+
+
+function resetRound(){
+
+    cancelRobotTimer();
+
+    currentGuess = "";
+
+    roundFinished = false;
+    robotThinking = false;
+
+    updateGuessDisplay();
+
+    hint.innerText =
+    "Enter a number";
+
+    hint.className =
+    "hint";
+
+    nextButton.classList.add("hidden");
+
+    updateTurn();
+    updateRobotUI();
+
+
+    if(
+        robotMode &&
+        currentPlayer === 2
+    ){
+
+        startRobotTurn();
+
+    }
+
+}
+
+
+function addDigit(digit){
+
+    if(
+        roundFinished ||
+        robotThinking
+    ){
+        return;
+    }
+
+
+    if(currentGuess.length >= 3){
+        return;
+    }
+
+
+    if(
+        currentGuess === "" &&
+        digit === "0"
+    ){
+        return;
+    }
+
+
+    const newGuess =
+    currentGuess + digit;
+
+    const n =
+    parseInt(newGuess,10);
+
+
+    if(n > 100){
+        return;
+    }
+
+
+    currentGuess = newGuess;
+
+    updateGuessDisplay();
+
+}
+
+
+document
+.querySelectorAll(".num-btn[data-number]")
+.forEach(function(button){
+
+    button.onclick = function(){
+
+        addDigit(
+            button.dataset.number
+        );
+
+    };
+
+});
+
+
+clearButton.onclick =
+function(){
+
+    if(
+        roundFinished ||
+        robotThinking
+    ){
+        return;
+    }
+
+    currentGuess = "";
+
+    updateGuessDisplay();
+
+};
+
+
+backButton.onclick =
+deleteLastDigit;
+
+
+function deleteLastDigit(){
+
+    if(
+        roundFinished ||
+        robotThinking
+    ){
+        return;
+    }
+
+    currentGuess =
+    currentGuess.slice(0,-1);
+
+    updateGuessDisplay();
+
+}
+
+
+document.addEventListener(
+"keydown",
+function(event){
+
+    if(
+        gameScreen.classList.contains("hidden")
+    ){
+        return;
+    }
+
+
+    if(
+        event.key >= "0" &&
+        event.key <= "9"
+    ){
+
+        event.preventDefault();
+
+        addDigit(event.key);
+
+        return;
+
+    }
+
+
+    if(event.key === "Backspace"){
+
+        event.preventDefault();
+
+        deleteLastDigit();
+
+        return;
+
+    }
+
+
+    if(event.key === "Enter"){
+
+        event.preventDefault();
+
+        submitGuess();
+
+    }
+
+});
+
+
+submitButton.onclick =
+submitGuess;
+
+
+function submitGuess(){
+
+    if(
+        roundFinished ||
+        robotThinking
+    ){
+        return;
+    }
+
+
+    if(currentGuess === ""){
+
+        showHint(
+            "⚠ SELECT A NUMBER FIRST!",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const guess =
+    parseInt(currentGuess,10);
+
+
+    if(
+        Number.isNaN(guess) ||
+        guess < 1 ||
+        guess > 100
+    ){
+
+        showHint(
+            "⚠ NUMBER MUST BE 1 - 100!",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(guess === targetNumber){
+
+        scores[currentPlayer-1]++;
+
+        updateScores();
+
+        roundFinished = true;
+
+        currentGuess = "";
+
+        updateGuessDisplay();
+
+
+        showHint(
+            "🎯 " +
+            getPlayerName(currentPlayer) +
+            " FOUND THE TARGET!",
+            "correct"
+        );
+
+
+        statusText.innerText =
+        getPlayerName(currentPlayer) +
+        " WINS THIS ROUND!";
+
+
+        nextButton.classList.remove("hidden");
+
+
+        nextButton.innerText =
+        currentRound >= totalRounds
+        ? "🏆 FINAL RESULT"
+        : "➡ NEXT ROUND";
+
+
+        return;
+
+    }
+
+
+    const difference =
+    Math.abs(guess-targetNumber);
+
+
+    if(difference <= 5){
+
+        showHint(
+            "🔥 VERY CLOSE!",
+            "close"
+        );
+
+    }
+    else if(guess < targetNumber){
+
+        showHint(
+            "⬆ TOO LOW!",
+            "low"
+        );
+
+    }
+    else{
+
+        showHint(
+            "⬇ TOO HIGH!",
+            "high"
+        );
+
+    }
+
+
+    currentGuess = "";
+
+    updateGuessDisplay();
+
+    moveToNextPlayer();
+
+}
+
+
+function moveToNextPlayer(){
+
+    currentPlayer++;
+
+
+    if(currentPlayer > totalPlayers){
+
+        currentPlayer = 1;
+
+    }
+
+
+    updateTurn();
+
+
+    if(
+        robotMode &&
+        currentPlayer === 2
+    ){
+
+        startRobotTurn();
+
+    }
+
+}
+
+
+function showHint(message,type){
+
+    hint.innerText = message;
+
+    hint.className = "hint";
+
+    if(type){
+        hint.classList.add(type);
+    }
+
+}
+
+
+function clamp(value){
+
+    return Math.max(
+        1,
+        Math.min(
+            100,
+            value
+        )
+    );
+
+}
+
+
+function getRobotGuess(){
+
+    if(selectedRobotLevel === "easy"){
+
+        return Math.floor(
+            Math.random()*100
+        )+1;
+
+    }
+
+
+    if(selectedRobotLevel === "medium"){
+
+        if(Math.random()<0.5){
+
+            return clamp(
+                targetNumber +
+                Math.floor(
+                    Math.random()*21
+                )-10
+            );
+
+        }
+
+        return Math.floor(
+            Math.random()*100
+        )+1;
+
+    }
+
+
+    if(selectedRobotLevel === "hard"){
+
+        return clamp(
+            targetNumber +
+            Math.floor(
+                Math.random()*11
+            )-5
+        );
+
+    }
+
+
+    if(selectedRobotLevel === "expert"){
+
+        if(Math.random()<0.7){
+
+            return targetNumber;
+
+        }
+
+        return clamp(
+            targetNumber +
+            Math.floor(
+                Math.random()*5
+            )-2
+        );
+
+    }
+
+
+    return 1;
+
+}
+
+
+function startRobotTurn(){
+
+    if(
+        !robotMode ||
+        roundFinished ||
+        currentPlayer !== 2
+    ){
+        return;
+    }
+
+
+    cancelRobotTimer();
+
+    robotThinking = true;
+
+    robotFace.innerText =
+    "🤖💭";
+
+    robotStatus.innerText =
+    "Robot is thinking...";
+
+
+    robotTimer =
+    setTimeout(
+    function(){
+
+        robotTimer = null;
+
+
+        if(
+            !robotMode ||
+            roundFinished ||
+            currentPlayer !== 2
+        ){
+
+            robotThinking = false;
+
+            return;
+
+        }
+
+
+        const robotGuess =
+        getRobotGuess();
+
+
+        currentGuess =
+        String(robotGuess);
+
+
+        if(showGuess){
+
+            guessDisplay.innerText =
+            currentGuess;
+
+        }
+        else{
+
+            guessDisplay.innerText =
+            "🔒";
+
+        }
+
+
+        robotFace.innerText =
+        "🤖";
+
+        robotStatus.innerText =
+        "Robot made a guess";
+
+
+        robotDisplayTimer =
+        setTimeout(
+        function(){
+
+            robotDisplayTimer = null;
+
+
+            if(
+                !robotMode ||
+                roundFinished ||
+                currentPlayer !== 2
+            ){
+
+                robotThinking = false;
+
+                return;
+
+            }
+
+
+            robotThinking = false;
+
+            submitGuess();
+
+        },
+        1000
+        );
+
+    },
+    900
+    );
+
+}
+
+
+function cancelRobotTimer(){
+
+    if(robotTimer !== null){
+
+        clearTimeout(robotTimer);
+
+        robotTimer = null;
+
+    }
+
+
+    if(robotDisplayTimer !== null){
+
+        clearTimeout(robotDisplayTimer);
+
+        robotDisplayTimer = null;
+
+    }
+
+}
+
+
+nextButton.onclick =
+nextRound;
+
+
+function nextRound(){
+
+    if(currentRound >= totalRounds){
+
+        showFinalResult();
+
+        return;
+
+    }
+
+
+    currentRound++;
+
+    currentPlayer = 1;
+
+    createTarget();
+
+    updateRound();
+
+    resetRound();
+
+}
+
+
+mainMenuButton.onclick =
+goToMainMenu;
+
+
+function goToMainMenu(){
+
+    cancelRobotTimer();
+
+    robotThinking = false;
+
+    currentGuess = "";
+
+    gameScreen.classList.add("hidden");
+
+    resultScreen.classList.add("hidden");
+
+    menuScreen.classList.remove("hidden");
+
+
+    roundsInput.value =
+    totalRounds;
+
+    playersSelect.value =
+    totalPlayers;
+
+    robotLevelSelect.value =
+    selectedRobotLevel;
+
+
+    updateRobotUI();
+    updateShowGuessUI();
+
+}
+
+
+function showFinalResult(){
+
+    cancelRobotTimer();
+
+    robotThinking = false;
+
+    gameScreen.classList.add("hidden");
+
+    resultScreen.classList.remove("hidden");
+
+
+    let highest =
+    scores[0];
+
+
+    for(
+        let i=1;
+        i<totalPlayers;
+        i++
+    ){
+
+        if(scores[i]>highest){
+
+            highest =
+            scores[i];
+
+        }
+
+    }
+
+
+    const winners = [];
+
+
+    for(
+        let i=0;
+        i<totalPlayers;
+        i++
+    ){
+
+        if(scores[i]===highest){
+
+            winners.push(i+1);
+
+        }
+
+    }
+
+
+    if(winners.length>1){
+
+        $("winner").innerText =
+        "🤝 GAME DRAW!";
+
+    }
+    else{
+
+        $("winner").innerText =
+        "🎉 " +
+        getPlayerName(winners[0]) +
+        " WINS!";
+
+    }
+
+
+    let result = "";
+
+
+    for(
+        let i=0;
+        i<totalPlayers;
+        i++
+    ){
+
+        result +=
+        getPlayerName(i+1) +
+        " : " +
+        scores[i];
+
+
+        if(i<totalPlayers-1){
+
+            result += "<br>";
+
+        }
+
+    }
+
+
+    $("finalScore").innerHTML =
+    result;
+
+}
+
+
+playAgainButton.onclick =
+function(){
+
+    cancelRobotTimer();
+
+    robotThinking = false;
+
+    resultScreen.classList.add("hidden");
+
+    menuScreen.classList.remove("hidden");
+
+
+    roundsInput.value =
+    totalRounds;
+
+    playersSelect.value =
+    totalPlayers;
+
+    robotLevelSelect.value =
+    selectedRobotLevel;
+
+
+    updateRobotUI();
+    updateShowGuessUI();
+
+};
+
+
+updateRobotUI();
+updateShowGuessUI();
+
+</script>
+
+</body>
+</html>
